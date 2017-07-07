@@ -56,6 +56,7 @@ class APIBlueprint(SmartReprMixin):
         self._metadata = {}
         self._name = None
         self._overview = None
+        self._introduction = {}
         self._groups = OrderedDict()
         self._trie = trie()
         self._data_structures = OrderedDict()
@@ -70,6 +71,12 @@ class APIBlueprint(SmartReprMixin):
     @property
     def metadata(self):
         return self._metadata
+
+    @property
+    def introduction(self):
+        # non-standard API Blueprint syntax that goes at the top of the document.
+        # It emulates the Apiary behaviour, allowing extra sections that are not API calls to be added to the start of a document
+        return self._introduction
 
     @property
     def format(self):
@@ -204,32 +211,57 @@ class APIBlueprint(SmartReprMixin):
         self._overview, index = parse_description(root, index, "h1")
         self._attributes = {}
         self._models = {}
+
+        # parse non-standard API Blueprint sections at the top of the document, before the first API Blueprint Group
+        root_count = len(root)-1
+        overview_count = 0
+        while index < root_count and not self._is_group(root[index]):
+            # we build a dictionary, where each h1 (delimiting a "section") can have multiple h2 children (delimiting "subsections")
+            if root[index].tag == 'h1':
+                section_description, idx = parse_description(root, index+1, 'h1', 'h2')
+                overview_count = overview_count + 1
+                self._overviews[overview_count] = {
+                   'title': root[index].text,
+                   'description': section_description,
+                   'children': [],
+                }
+
+            if root[index].tag == 'h2':
+                # ran into a child h2, added to the parent h1's children list
+                section_description, idx = parse_description(root, index+1, 'h1', 'h2')
+                self._overviews[overview_count-1]['children'].append({
+                   'title': root[index].text,
+                   'description': section_description,
+                })
+            index = index + 1
+
         try:
-            current = root[index]
-            sequence = [current]
-            tag = current.tag
-            is_group = self._is_group(current)
-            is_data_structures = self._is_data_structures(current)
-            for item in root[index + 1:]:
-                if self._is_header(item) and item.tag <= tag:
-                    if is_group:
-                        self._parse_resource_group(sequence)
-                    else:
-                        self._parse_resource(sequence, None)
-                    del sequence[:]
-                    tag = item.tag
-                    is_group = self._is_group(item)
-                    if not is_group:
-                        is_data_structures = self._is_data_structures(item)
-                sequence.append(item)
-            if is_group:
-                self._parse_resource_group(sequence)
-            elif is_data_structures:
-                self._parse_data_structure(sequence)
-            else:
-                self._parse_resource(sequence, None)
-            self._reset_trie()
-            self._apply_attributes_references()
+            if index < root_count:
+                current = root[index]
+                sequence = [current]
+                tag = current.tag
+                is_group = self._is_group(current)
+                is_data_structures = self._is_data_structures(current)
+                for item in root[index + 1:]:
+                    if self._is_header(item) and item.tag <= tag:
+                        if is_group:
+                            self._parse_resource_group(sequence)
+                        else:
+                            self._parse_resource(sequence, None)
+                        del sequence[:]
+                        tag = item.tag
+                        is_group = self._is_group(item)
+                        if not is_group:
+                            is_data_structures = self._is_data_structures(item)
+                    sequence.append(item)
+                if is_group:
+                    self._parse_resource_group(sequence)
+                elif is_data_structures:
+                    self._parse_data_structure(sequence)
+                else:
+                    self._parse_resource(sequence, None)
+                self._reset_trie()
+                self._apply_attributes_references()
         finally:
             del self._attributes
             del self._models
