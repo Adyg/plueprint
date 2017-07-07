@@ -220,7 +220,7 @@ class APIBlueprint(SmartReprMixin):
             if root[index].tag == 'h1':
                 section_description, idx = parse_description(root, index+1, 'h1', 'h2')
                 overview_count = overview_count + 1
-                self._overviews[overview_count] = {
+                self._introduction[overview_count] = {
                    'title': root[index].text,
                    'description': section_description,
                    'children': [],
@@ -229,7 +229,7 @@ class APIBlueprint(SmartReprMixin):
             if root[index].tag == 'h2':
                 # ran into a child h2, added to the parent h1's children list
                 section_description, idx = parse_description(root, index+1, 'h1', 'h2')
-                self._overviews[overview_count-1]['children'].append({
+                self._introduction[overview_count-1]['children'].append({
                    'title': root[index].text,
                    'description': section_description,
                 })
