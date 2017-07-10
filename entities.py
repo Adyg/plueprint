@@ -977,6 +977,12 @@ class Action(ApiSection):
                 values[p.name] = p.default_value
             if p.value is not None:
                 values[p.name] = p.value
+        # no default values, default to the param names
+        if not values:
+           url_variables = self.uri_template.variable_names
+           for url_variable in url_variables:
+               values[url_variable] = '<span class="default">'+url_variable+'</span>'
+
         return self.uri_template.expand(values)
 
     _relation = property_with_parent("_relation", Relation)
