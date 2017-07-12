@@ -251,7 +251,7 @@ def Collection(child_type):
 class Attribute(NamedSection):
     def __init__(self, parent, name, type_, required, description, value):
         super(Attribute, self).__init__(parent, name, description)
-        self._type = type_ or "object"
+        self._type = type_ or "string"
         self._required = required
         self._description = description
         self._value = value
@@ -282,7 +282,7 @@ class Attribute(NamedSection):
                 raise ValueError("Invalid type format: %s")
             subtype = subtype[1:-1]
         else:
-            subtype = "object"
+            subtype = "string"
         return subtype
 
     def __str__(self):
@@ -384,7 +384,7 @@ class Attribute(NamedSection):
         if attr.is_array:
             subtype = attr.extract_array_subtype(attr.type)
             for c in children:
-                if c.type == "object":
+                if c.type == "string":
                     c._type = subtype
         return attr
 
