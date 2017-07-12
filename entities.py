@@ -427,6 +427,9 @@ class Parameter(Attribute):
             attr._description = desc
         elif desc is not None:
             attr._description += "\n" + desc
+        elif desc is None:
+            desc = attr._description
+
         defval = None
         members = None
         if len(node) > index:
