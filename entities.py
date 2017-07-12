@@ -318,7 +318,9 @@ class Attribute(NamedSection):
     def parse_from_string(cls, parent, line):
         if line[0] in ('-', '+'):
             line = line[1:]
-        desc_pos = line.rfind('-')
+        desc_pos = line.rfind('\n')
+        if desc_pos == -1:
+            desc_pos = line.rfind('-')
         if desc_pos > -1:
             desc = line[desc_pos + 1:].strip()
             line = line[:desc_pos].strip()
