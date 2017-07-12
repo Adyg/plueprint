@@ -976,14 +976,15 @@ class Action(ApiSection):
     @property
     def uri(self):
         values = {}
-        for p in chain(self.parent.parameters or tuple(),
-                       self.parameters or tuple()):
+        expected_params = chain(self.parent.parameters or tuple(),
+                       self.parameters or tuple())
+        for p in expected_params:
             if p.default_value is not None:
                 values[p.name] = p.default_value
             if p.value is not None:
                 values[p.name] = p.value
         # no default values, default to the param names
-        if not values:
+        if not values or len(values) < len(expected_params):
            url_variables = self.uri_template.variable_names
            for url_variable in url_variables:
                values[url_variable] = '<span class="default">'+url_variable+'</span>'
