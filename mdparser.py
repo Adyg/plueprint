@@ -229,7 +229,7 @@ class APIBlueprint(SmartReprMixin):
             if root[index].tag == 'h2':
                 # ran into a child h2, added to the parent h1's children list
                 section_description, idx = parse_description(root, index+1, 'h1', 'h2')
-                self._introduction[overview_count-1]['children'].append({
+                self._introduction[overview_count]['children'].append({
                    'title': root[index].text,
                    'description': section_description,
                 })
