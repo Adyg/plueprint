@@ -12,7 +12,7 @@ setup(
     name="plueprint",
     description="API Blueprint (https://apiblueprint.org/) parser in pure "
                 "Python",
-    version="0.4.94",
+    version="0.4.96",
     license="New BSD",
     author="Vadim Markovtsev",
     author_email="gmarkhor@gmail.com",
