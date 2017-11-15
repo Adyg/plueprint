@@ -520,7 +520,6 @@ class PlueprintExtension(Extension):
 
     def extendMarkdown(self, md, md_globals):
         md.output_formats["apiblueprint"] = self.to_apiblueprint
-        md.preprocessors["remove_backquotes"] = BackQuotesRemover(md)
         md.preprocessors["align_indent"] = IndentationAligner(md)
         md.treeprocessors["lift_title"] = TitleLifter(md)
         md.postprocessors.clear()
