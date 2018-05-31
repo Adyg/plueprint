@@ -309,9 +309,19 @@ class APIBlueprint(SmartReprMixin):
         desc, index = parse_description(
             sequence, 1, self._next_header_tag(sequence[0].tag), "ul")
         if len(sequence) <= index:
+            nx_desc = ''
+            nx_title = ''
+            for s in sequence:
+                if s.tag == 'h1':
+                   nx_title = s.text
+                else:
+                   nx_desc += to_html_string(s)+"\n"
+            if len(sequence):
+               self._groups[nx_title] = ResourceGroup(self, nx_title, nx_desc)
+               self._groups[nx_title].is_text = True
             if entities.report_warnings:
                 sys.stderr.write("Skipping empty resource %s\n" % rdef[0])
-            return
+            return 
         desc_sections = False
         if sequence[index].tag in ("ul", "ol"):
             sections = []
